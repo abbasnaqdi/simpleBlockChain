@@ -1,6 +1,9 @@
 package chainpkg
 
-import "crypto/sha1"
+import (
+	"crypto/sha256"
+	"encoding/hex"
+)
 
 type Block struct {
 	PrvHash string
@@ -23,6 +26,7 @@ func makeBlock(prvHash, data string) *Block {
 	block := &Block{
 		PrvHash: prvHash,
 		Data:    data,
+		Hash:    getHash(prvHash, data),
 	}
 
 	return block
@@ -30,15 +34,13 @@ func makeBlock(prvHash, data string) *Block {
 
 func (chain *BlockChain) AppendBlock(data string) *Block {
 	prvBlock := chain.Blocks[len(chain.Blocks)-1]
-	newBlock := makeBlock(prvBlock.toHash(), data)
+	newBlock := makeBlock(prvBlock.Hash, data)
 	chain.Blocks = append(chain.Blocks, newBlock)
 
 	return newBlock
 }
 
-func (block *Block) toHash() string {
-	h := sha1.New()
-	h.Write([]byte(block.Data))
-
-	return string(h.Sum(nil))
+func getHash(prv, data string) string {
+	hash := sha256.Sum256([]byte(prv + data))
+	return hex.EncodeToString(hash[:])
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"abbas/blockchain/chain"
 	"abbas/blockchain/proto"
 	"flag"
 	"log"
@@ -19,7 +18,7 @@ func main() {
 	listFlag := flag.Bool("list", false, "List all blocks")
 	flag.Parse()
 
-	conn, err := grpc.Dial("localhost:8080", grpc.WithInsecure())
+	conn, err := grpc.Dial("localhost:8081", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("cannot dial server: %v", err)
 	}
@@ -46,13 +45,13 @@ func addBlock() {
 }
 
 func getBlockchain() {
-	blockchain, getErr := client.GetBlockchain(context.Background(), &protopkg.ChainRequest{})
+	blockchain, getErr := client.GetChain(context.Background(), &protopkg.ChainRequest{})
 	if getErr != nil {
 		log.Fatalf("unable to get blockchain: %v", getErr)
 	}
 
 	log.Println("blocks:")
 	for _, b := range blockchain.Blocks {
-		log.Printf("hash %s, prev hash: %s, data: %s\n", b.Hash, b.PrevBlockHash, b.Data)
+		log.Printf("hash %s, prev hash: %s, data: %s \n", b.Hash, b.PrvHash, b.Data)
 	}
 }
