@@ -1,26 +1,40 @@
-package server
+package main
 
 import (
+	"abbas/blockchain/chain"
 	"abbas/blockchain/proto"
-	"context"
-	"crypto/sha1"
 	"log"
-	"math/rand"
 	"net"
+
+	"golang.org/x/net/context"
 
 	"google.golang.org/grpc"
 )
 
-type BlockChain struct {
-	blockchain proto.ChainResponce
+type Server struct {
+	chain *chainpkg.BlockChain
 }
 
-func AddBlocks(context.Context, *BlockRequest) (*BlockResponce, error) {
+func (s *Server) AddBlock(ctx context.Context, req *protopkg.BlockRequest) (*protopkg.BlockResponce, error) {
+	block := s.chain.AppendBlock(req.Data)
 
+	return &protopkg.BlockResponce{
+		Hash: block.Hash,
+	}, nil
 }
 
-func GetChain(context.Context, *ChainRequest) (*ChainResponce, error) {
+func (s *Server) GetChain(ctx context.Context, req *protopkg.ChainRequest) (*protopkg.ChainResponce, error) {
+	res := new(protopkg.ChainResponce)
+	for _, block := range s.chain.Blocks {
 
+		res.Blocks = append(res.Blocks, &protopkg.Block{
+			PrvHash: block.PrvHash,
+			Data:    block.Data,
+			Hash:    block.Hash,
+		})
+
+	}
+	return res, nil
 }
 
 func main() {
@@ -31,19 +45,9 @@ func main() {
 	}
 
 	srv := grpc.NewServer()
-	proto.RegisterBlockchainServiceServer(srv, &BlockChain{})
+	server := &Server{chainpkg.MakeBlockChain()}
+
+	protopkg.RegisterBlockChainServer(srv, server)
+
 	srv.Serve(listener)
-}
-
-func makeBlock(prvHash string) proto.Block {
-	data := rand.Intn(10000)
-	hash := toHash(string(data))
-
-	return proto.Block{PrvHash: prvHash, Data: string(data), Hash: hash}
-}
-
-func toHash(value string) string {
-	h := sha1.New()
-	h.Write([]byte(value))
-	return string(h.Sum(nil))
 }
