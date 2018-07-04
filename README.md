@@ -17,6 +17,11 @@ Start server:
 go run server/server.go
 ```
 
+mining block as client:
+```
+go run client/client.go --start
+```
+
 Add block as client:
 ```
 go run client/client.go --add
