@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package proto;
+
+message Block {
+    string prvHash = 1;
+    string data = 2;
+    string hash = 3;
+}
+
+message BlockRequest{
+    int32 size = 1;
+}
+
+message BlockResponce{
+    int32 size = 1;
+}
+
+message ChainRequest{}
+
+message ChainResponce{
+    repeated Block block = 1;
+}
+
+service BlockchainService{
+    rpc addBlocks(BlockRequest) returns (BlockResponce){}
+    rpc getChain(ChainRequest) returns (ChainResponce){}
+}
