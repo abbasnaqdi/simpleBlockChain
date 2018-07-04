@@ -14,8 +14,10 @@ import (
 var client protopkg.BlockChainClient
 
 func main() {
-	addFlag := flag.Bool("add", false, "Add new block")
-	listFlag := flag.Bool("list", false, "List all blocks")
+	start := flag.Bool("start", false, "add block to chain")
+	add := flag.Bool("add", false, "start mining block")
+	list := flag.Bool("list", false, "List all blocks")
+
 	flag.Parse()
 
 	conn, err := grpc.Dial("localhost:8081", grpc.WithInsecure())
@@ -25,12 +27,34 @@ func main() {
 
 	client = protopkg.NewBlockChainClient(conn)
 
-	if *addFlag {
+	if *start {
+		startMining()
+	}
+
+	if *add {
 		addBlock()
 	}
 
-	if *listFlag {
-		getBlockchain()
+	if *list {
+		getBlockChain()
+	}
+}
+
+func startMining() {
+
+	for {
+
+		block, addErr := client.AddBlock(context.Background(), &protopkg.BlockRequest{
+			Data: time.Now().String(),
+		})
+
+		if addErr != nil {
+			log.Fatalf("unable to add block: %v", addErr)
+		}
+
+		log.Printf("new block hash: %s \n", block.Hash)
+
+		time.Sleep(1 * time.Second)
 	}
 }
 
@@ -44,7 +68,7 @@ func addBlock() {
 	log.Printf("new block hash: %s\n", block.Hash)
 }
 
-func getBlockchain() {
+func getBlockChain() {
 	blockchain, getErr := client.GetChain(context.Background(), &protopkg.ChainRequest{})
 	if getErr != nil {
 		log.Fatalf("unable to get blockchain: %v", getErr)
