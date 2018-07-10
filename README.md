@@ -1,33 +1,23 @@
-#### Blockchain simulation project using gRPC and Protocol Buffers .
+###### This is a blockchain training project that has been programmed using Protocol Buffers and gRPC.
 
-#### Setup Packages
+###### Dependencies :
+```
+go get -u github.com/golang/protobuf/protoc-gen-go
+go get -u google.golang.org/grpc
+go get -u golang.org/x/net/context
+go get -u github.com/golang/protobuf/proto
+ ```
 
- - Install [protoc](https://github.com/google/protobuf/releases) compiler.
- - Install `protoc-gen-go plugin`: `go get -u github.com/golang/protobuf/protoc-gen-go`
- - Define service definition in `.proto` file.
- - Build Go bindings from `.proto` file. `protoc --go_out=plugins=grpc:. proto/blockchain.proto`
- - Install grpc Go package - `go get -u google.golang.org/grpc`.
- - Install context package - `go get -u golang.org/x/net/context`.
- - Install protobuf package - `go get -u github.com/golang/protobuf/proto`
+###### Get Started :
 
-#### 
-
-Start server:
+start server :
 ```
 go run server/server.go
 ```
 
-mining block as client:
+start client :
 ```
-go run client/client.go --start
-```
-
-Add block as client:
-```
-go run client/client.go --add
-```
-
-get blockchain as client:
-```
-go run client/main.go --list
+go run client/client.go --start     //start connecting the chains
+go run client/client.go --add       //added a block to the chain
+go run client/main.go --list        //get all of the generated block chains
 ```
